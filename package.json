@@ -1,14 +1,15 @@
 {
   "name": "eleventy-plugin-tailwindcss-4",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "publish": "npm version patch --force && npm publish"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dwkns/eleventy-plugin-tailwindcss-4.git"},
+    "url": "https://github.com/dwkns/eleventy-plugin-tailwindcss-4.git"
+  },
   "author": "dwkns",
   "license": "MIT",
   "description": "An Eleventy plugin to process Tailwind CSS",
