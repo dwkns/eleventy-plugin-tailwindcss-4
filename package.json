@@ -1,6 +1,6 @@
 {
   "name": "eleventy-plugin-tailwindcss-4",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "main": "index.js",
   "type": "module",
   "scripts": {
