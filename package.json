@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "pub": "#### use ./bin/pub ### to publlish to npm"
+    "pub": "#### use ./bin/publish ### to publlish to npm"
   },
   "repository": {
     "type": "git",
