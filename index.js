@@ -1,16 +1,19 @@
 import { execSync } from 'child_process'
 
 export const tailwindcss = (eleventyConfig, options) => {
-  console.log("options: ", options)
-  eleventyConfig.addWatchTarget(options.input);
+  
+  const source = `${eleventyConfig.dir.input}/${options.input}`
+  const generated = `${eleventyConfig.dir.output}/${options.output}`
+
+  eleventyConfig.addWatchTarget(source);
   eleventyConfig.on("eleventy.after", () => {
-    console.log("running command", `npx @tailwindcss/cli -i ${options.input} -o ${options.output}` )
+    // console.log("running command", `npx @tailwindcss/cli -i ${source} -o ${generated}` )
     execSync(
-      `npx @tailwindcss/cli -i ${options.input} -o ${options.output}`
+      `npx @tailwindcss/cli -i ${source} -o ${generated}`
     );
   });
   eleventyConfig.setServerOptions({
-    watch: [options.output]
+    watch: [generated]
   })
 }
 
