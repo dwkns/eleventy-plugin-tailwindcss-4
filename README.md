@@ -39,6 +39,9 @@ Ensure you have link to the generated style sheet in the `<head>` of your templa
 <link rel="stylesheet" href="/styles.css">
 ```
 
+## Example repo
+[Example repo](https://github.com/dwkns/etw-minimal) of the plugin installed, configured and working.
+
 ## Known Issues
 Eleventy does not wait for `eleventy.after` to complete before the dev server reload is triggered. To ensure that your CSS changes are picked up, the plugin watches the generated CSS in your output folder and reloads the dev server when its finished compiling. 
 
