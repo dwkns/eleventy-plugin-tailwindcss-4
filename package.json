@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "publish": "npm version patch --force && npm publish"
+     "pub": "#### use ./bin/pub ### to publlish to npm"
   },
   "repository": {
     "type": "git",
