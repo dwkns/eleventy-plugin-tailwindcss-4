@@ -1,0 +1,16 @@
+{
+  "name": "eleventy-plugin-tailwindcss",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "dwkns",
+  "license": "MIT",
+  "description": "An Eleventy plugin to process Tailwind CSS",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.0.12",
+    "tailwindcss": "^4.0.12"
+  }
+}
