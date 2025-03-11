@@ -1,0 +1,2 @@
+#!/usr/bin/env zsh
+npm version patch --force && npm publish
