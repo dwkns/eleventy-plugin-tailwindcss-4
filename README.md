@@ -33,6 +33,7 @@ module.exports = function (eleventyConfig) {
 };
 ```
 
+
 ### Create a Tailwind source file
  In Tailwind 4 this file acts both as your source CSS file and the Tailwind Config file: `src/css/tailwind.css`
 ```css
