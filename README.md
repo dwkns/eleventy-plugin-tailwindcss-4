@@ -20,14 +20,6 @@ export default (eleventyConfig) => {
     output:'styles.css' // relative to your project output folder
   });
 };
-
-export const config = {
-  htmlTemplateEngine: "njk",
-  dir: {
-    input: "src",
-    output: "dist"
-  },
-};
 ```
 #### CJS
 ```js
@@ -39,17 +31,7 @@ module.exports = function (eleventyConfig) {
     output:'styles.css' // relative to your project output folder
   });
 };
-
-module.exports.config = {
-  htmlTemplateEngine: "njk",
-  dir: {
-    input: "src",
-    output: "dist"
-  },
-};
 ```
-
-
 
 ### Create a Tailwind source file
  In Tailwind 4 this file acts both as your source CSS file and the Tailwind Config file: `src/css/tailwind.css`
