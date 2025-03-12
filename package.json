@@ -4,7 +4,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "pub": "#### use ./bin/publish ### to publlish to npm"
+    "pub": "#### use ./bin/publish ### to publlish to npm",
+    "build": "npx rollup index.js --file index.cjs --format cjs"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,12 @@
   "dependencies": {
     "@tailwindcss/cli": "^4.0.12",
     "tailwindcss": "^4.0.12"
+  },
+  "exports": {
+    "import": "./index.js",
+    "require": "./index.cjs"
+  },
+  "devDependencies": {
+    "rollup": "^4.35.0"
   }
 }

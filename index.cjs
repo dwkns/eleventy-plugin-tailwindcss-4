@@ -1,20 +1,22 @@
-import { execSync } from 'child_process'
+'use strict';
 
- const tailwindcss = (eleventyConfig, options) => {
+var child_process = require('child_process');
+
+const tailwindcss = (eleventyConfig, options) => {
   
-  const source = `${eleventyConfig.dir.input}/${options.input}`
-  const generated = `${eleventyConfig.dir.output}/${options.output}`
+  const source = `${eleventyConfig.dir.input}/${options.input}`;
+  const generated = `${eleventyConfig.dir.output}/${options.output}`;
 
   eleventyConfig.addWatchTarget(source);
   eleventyConfig.on("eleventy.after", () => {
     // console.log("running command", `npx @tailwindcss/cli -i ${source} -o ${generated}` )
-    execSync(
+    child_process.execSync(
       `npx @tailwindcss/cli -i ${source} -o ${generated}`
     );
   });
   eleventyConfig.setServerOptions({
     watch: [generated]
-  })
-}
+  });
+};
 
-export default tailwindcss
+module.exports = tailwindcss;

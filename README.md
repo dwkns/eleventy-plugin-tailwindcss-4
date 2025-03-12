@@ -9,6 +9,8 @@ $ npm -i eleventy-plugin-tailwindcss-4 tailwindcss @tailwindcss/cli
 ```
 ### Configure Eleventy
 Import the plugin in your configuration file `eleventy.config.js`.
+
+#### ES6
 ```js
 import tailwindcss from 'eleventy-plugin-tailwindcss-4'
 
@@ -27,6 +29,28 @@ export const config = {
   },
 };
 ```
+#### CJS
+```js
+const tailwindcss = require('eleventy-plugin-tailwindcss-4')
+
+module.exports = function (eleventyConfig) {
+  eleventyConfig.addPlugin(tailwindcss, {
+    input: 'css/tailwind.css', // relative to your project input folder
+    output:'styles.css' // relative to your project output folder
+  });
+};
+
+module.exports.config = {
+  htmlTemplateEngine: "njk",
+  dir: {
+    input: "src",
+    output: "dist"
+  },
+};
+```
+
+
+
 ### Create a Tailwind source file
  In Tailwind 4 this file acts both as your source CSS file and the Tailwind Config file: `src/css/tailwind.css`
 ```css
@@ -40,7 +64,7 @@ Ensure you have link to the generated style sheet in the `<head>` of your templa
 ```
 
 ## Example repo
-[Example repo](https://github.com/dwkns/etw-minimal) of the plugin installed, configured and working.
+[Example repo](https://github.com/dwkns/etw-minimal) of the plugin installed, configured (ES6) and working.
 
 ## Known Issues
 Eleventy does not wait for `eleventy.after` to complete before the dev server reload is triggered. To ensure that your CSS changes are picked up, the plugin watches the generated CSS in your output folder and reloads the dev server when its finished compiling. 
