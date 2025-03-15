@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "pub": "#### use ./bin/publish ### to publlish to npm",
-    "build": "npx rollup index.js --file index.cjs --format cjs"
+    "build": "npx rollup -c"
   },
   "repository": {
     "type": "git",
