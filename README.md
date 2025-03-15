@@ -44,7 +44,7 @@ export default (eleventyConfig) => {
   eleventyConfig.addPlugin(tailwindcss, {
     input: 'css/tailwind.css' 
   } );
-  
+
 }
 ```
 
@@ -91,11 +91,11 @@ By defaul the plugin writes out your CSS to `_site/styles.css` or whatever you h
 
 | Option      | Required | Type     | Default      | Description                                                        |
 | :---------- | :------- | :------- | :----------- | :----------------------------------------------------------------- | 
-| input       | Yes      | String   | -            | Tailwind source CSS/config relative to your Eleventy output folder |
-| output      | Optional | String   | 'styles.css' | Output filename relative to your Eleventy output folder            |
-| minify      | Optional | Boolean  | false        | Use Tailwind's minify option                                       |
-| watchOutput | Optional | Boolean  | true         | Force a browser reload when output is written (see KOptionalues)   |      
-| debug       | Optional | Boolean  | false        | Show plugin and Tailwind debug output                              |
+| input       | Yes      | String   | -            | Tailwind source CSS/config relative to your Eleventy output folder.|
+| output      | Optional | String   | 'styles.css' | Output filename relative to your Eleventy output folder.           |
+| minify      | Optional | Boolean  | false        | Use Tailwind's minify option.                                      |
+| watchOutput | Optional | Boolean  | true         | Force a browser reload when output is written (see KOptionalues).  |      
+| debug       | Optional | Boolean  | false        | Show plugin and Tailwind debug output.                             |
 
 
 ## Example repo
