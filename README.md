@@ -30,7 +30,7 @@ const tailwindcss = require('eleventy-plugin-tailwindcss-4')
 `input` Is the only **_required_** option. It is your Tailwind source/config file and is relative to your Eleventy [input folder](https://www.11ty.dev/docs/config/#input-directory). 
 Other options are optional see all below. 
 ```js
-eleventyConfig.addPlugin(tailwindcss, inputCSS, {
+eleventyConfig.addPlugin(tailwindcss, {
   input: 'css/tailwind.css' 
 } );
 ```
