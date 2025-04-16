@@ -1,6 +1,9 @@
 # Eleventy Plugin TailwindCSS 4 
 An Eleventy plugin to make it easier to use Tailwind 4.0.x with Eleventy 3.0.x
 
+## Version 2.0
+This version uses PostCSS under the hood to process your templates. It is MUCH faster than version 1.x.x. 
+
 ## Installation & configuration
 
 Install `eleventy-plugin-tailwindcss-4` (this plugin), `tailwindcss` and `@tailwindcss/cli` into your Eleventy project.
@@ -28,10 +31,10 @@ const tailwindcss = require('eleventy-plugin-tailwindcss-4')
 ```
 ### Add the plugin
 `input` Is the only **_required_** option. It is your Tailwind source/config file and is relative to your Eleventy [input folder](https://www.11ty.dev/docs/config/#input-directory). 
-Other options are optional see all below. 
+All ther options are optional see below. 
 ```js
 eleventyConfig.addPlugin(tailwindcss, {
-  input: 'css/tailwind.css' 
+  input: 'css/tailwind.css' // required
 } );
 ```
 
@@ -59,6 +62,7 @@ export default (eleventyConfig) => {
     output: 'styles.css',
     minify: false,
     watchOutput: true,
+    domDiff: false,
     debug: false
   });
 
@@ -93,8 +97,9 @@ By defaul the plugin writes out your CSS to `_site/styles.css` or whatever you h
 | :---------- | :------- | :------- | :----------- | :----------------------------------------------------------------- | 
 | input       | Yes      | String   | -            | Tailwind source CSS/config relative to your Eleventy output folder.|
 | output      | Optional | String   | 'styles.css' | Output filename relative to your Eleventy output folder.           |
-| minify      | Optional | Boolean  | false        | Use Tailwind's minify option.                                      |
-| watchOutput | Optional | Boolean  | true         | Force a browser reload when output is written (see KOptionalues).  |      
+| minify      | Optional | Boolean  | false        | Use cssnano to minify.                                             |
+| watchOutput | Optional | Boolean  | true         | Force a browser reload when output is written                      |      
+| domDiff     | Optional | Boolean  | false        | Don't use Dev Server domDiffing as it causes unstyled flashes      |      
 | debug       | Optional | Boolean  | false        | Show plugin and Tailwind debug output.                             |
 
 
@@ -102,13 +107,9 @@ By defaul the plugin writes out your CSS to `_site/styles.css` or whatever you h
 [Example repo](https://github.com/dwkns/etw-minimal) of the plugin installed, configured (ES6) and working.
 
 ## Known Issues
-Eleventy does not wait for [Eeventy events](https://www.11ty.dev/docs/events/) to complete before the dev server reload is triggered. To ensure that your CSS changes are picked up, the plugin watches the generated CSS in your output folder and reloads the dev server when its finished compiling. 
+There is an issue with the domDiffing of the Dev Server happening before the plugin can write the CSS to the output folder. This can cause an extra reload in the browser and in some circumstances a flash of incorrectly styled content. The plugin turns off domDiffing by default which stops this from happening. 
 
-This means you have two dev server reloads and sometimes you might see some jankiness. However this I feel is prefereable to having to manually refresh the browser everytime. 
-
-You can turn this behaviour off with `watchOutput: false`, but you may have to reload your page manually to see all CSS changes.
-
-A soultion will probably require a "Wait until complete" feature in `eleventy.before` or the ability to set a `waitBeforeRefresh` in the dev server. See [#3692](https://github.com/11ty/eleventy/issues/3692) and [#104](https://github.com/11ty/eleventy-dev-server/issues/104)
+You can overide this with `domDiff: true` in the options if you need to. 
 
 ## Thanks
 @Hidden on the 11ty Discord
