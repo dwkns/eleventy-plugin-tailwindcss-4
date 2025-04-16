@@ -1,10 +1,10 @@
 {
   "name": "eleventy-plugin-tailwindcss-4",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "pub": "#### use ./bin/publish ### to publlish to npm",
+    "pub": "#### use ./bin/publish ### to publish to npm",
     "build": "npx rollup -c"
   },
   "repository": {
@@ -15,8 +15,11 @@
   "license": "MIT",
   "description": "An Eleventy plugin to process Tailwind CSS",
   "dependencies": {
-    "@tailwindcss/cli": "^4.0.12",
-    "tailwindcss": "^4.0.12"
+    "@tailwindcss/postcss": "^4.1.4",
+    "cssnano": "^7.0.6",
+    "kleur": "^4.1.5",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4"
   },
   "exports": {
     "import": "./index.js",
