@@ -6,9 +6,9 @@ This version uses PostCSS under the hood to process your templates. It is MUCH f
 
 ## Installation & configuration
 
-Install `eleventy-plugin-tailwindcss-4` (this plugin), `tailwindcss` and `@tailwindcss/cli` into your Eleventy project.
+Install `eleventy-plugin-tailwindcss-4` into your Eleventy project.
 ```bash
-$ npm -i eleventy-plugin-tailwindcss-4 tailwindcss @tailwindcss/cli 
+$ npm -i eleventy-plugin-tailwindcss-4 
 ```
 
 ### Create a Tailwind source/config file
@@ -47,7 +47,6 @@ export default (eleventyConfig) => {
   eleventyConfig.addPlugin(tailwindcss, {
     input: 'css/tailwind.css' 
   } );
-
 }
 ```
 
