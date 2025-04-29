@@ -110,6 +110,10 @@ There is an issue with the domDiffing of the Dev Server happening before the plu
 
 You can overide this with `domDiff: true` in the options if you need to. 
 
+## Versions
+2.0.1 Fixes an issue where in some cases output CSS could be written before output folder was created. 
+2.0.0 Major rewrite to use PostCSS under the hood
+
 ## Thanks
 @Hidden on the 11ty Discord
 
