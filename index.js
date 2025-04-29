@@ -66,15 +66,15 @@ const tailwindcss = (eleventyConfig, options) => {
 
   // Run the Tailwind command in the before event handler.
   eleventyConfig.on("eleventy.before", async function () {
-   
+
     let plugins = [tailwindCSS] // add tailwind plugin
-    if (options.minify ) {
+    if (options.minify) {
       plugins.push(cssnano) // conditionally add cssnano for minification
     }
 
     var startTime = performance.now(); // log start time
-   
-    
+
+
     if (inputValid) {
       // If we have a valid input file read the tailwind source file
       fs.readFile(tailwindSourceFile, (err, css) => {
@@ -85,7 +85,7 @@ const tailwindcss = (eleventyConfig, options) => {
         postcss(plugins)
           .process(css, { from: tailwindSourceFile, to: generatedCSSfile })
           .then(result => {
-            
+
             // result.css contains our 'compiled' css
             if (options.debug) {
               console.log(`${logPrefix + kleur.green(`PostCSS generated your CSS:`)} ${nl}${result.css.substring(0, options.debugTruncationLength)}...`)
@@ -96,32 +96,41 @@ const tailwindcss = (eleventyConfig, options) => {
             fs.mkdir(generatedCSSpath, { recursive: true }, (err) => {
               if (err) {
                 console.log(`${logPrefix + kleur.red().bold(`An error occured creating the output folder (error):`)} ${nl}${err}`)
+
+
+
+
               } else {
-                 // debug info
+                // debug info
                 if (options.debug) {
                   console.log(`${logPrefix + kleur.green(`Output directory:`)} ${generatedCSSpath} ${kleur.green(`exists or was created`)} `)
                 }
+
+                // Write our generated CSS out to file.
+                fs.writeFile(generatedCSSfile, result.css, err => {
+                  if (err) {
+                    console.log(`${logPrefix + kleur.red().bold(`An error occured writing the outputfile (error):`)} ${nl}${err}`)
+                  } else {
+                    const endTime = performance.now() // log completion time
+
+                    // debug info
+                    if (options.debug) {
+                      console.log(`${logPrefix + kleur.green(`CSS written to:`)} ${generatedCSSfile}`)
+                      console.log(`${logPrefix + kleur.green(`Processing`)} TailwindCSS ${kleur.green(`took `) + (endTime - startTime).toFixed(2)} ms`)
+                    }
+
+                    // Print out success to the console with timings
+                    console.log(`${logPrefix + kleur.green(`Wrote `) + generatedCSSfile + kleur.green(` in `) + (endTime - startTime).toFixed(2)} ms`)
+
+                  }
+                });
+
               }
             });
 
-            // Write our generated CSS out to file.
-            fs.writeFile(generatedCSSfile, result.css, err => {
-              if (err) {
-                console.log(`${logPrefix + kleur.red().bold(`An error occured writing the outputfile (error):`)} ${nl}${err}`)
-              } else {
-                const endTime = performance.now() // log completion time
-               
-                // debug info
-                if (options.debug) {
-                  console.log(`${logPrefix + kleur.green(`CSS written to:`)} ${generatedCSSfile}`)
-                  console.log(`${logPrefix + kleur.green(`Processing`)} TailwindCSS ${kleur.green(`took `) + (endTime - startTime).toFixed(2)} ms`)
-                }
-               
-                // Print out success to the console with timings
-                console.log(`${logPrefix + kleur.green(`Wrote `) + generatedCSSfile + kleur.green(` in `) + (endTime - startTime).toFixed(2)} ms`)
 
-              }
-            });
+
+
           })
       })
 
