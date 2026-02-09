@@ -103,11 +103,11 @@ describe('eleventy-plugin-tailwindcss-4', () => {
       const config = createMockConfig();
       tailwindcss(config, { input: 'css/tailwind.css' });
 
-      // Defaults: domDiff=false, watchOuput=true
+      // Defaults: domDiff=false, watchOutput=true
       expect(config.setServerOptions).toHaveBeenCalledWith(
         expect.objectContaining({ domDiff: false })
       );
-      // Default output is 'styles.css', watchOuput is true so it should be watched
+      // Default output is 'styles.css', watchOutput is true so it should be watched
       expect(config.setServerOptions).toHaveBeenCalledWith(
         expect.objectContaining({
           watch: ['_site/styles.css'],
@@ -121,7 +121,7 @@ describe('eleventy-plugin-tailwindcss-4', () => {
         input: 'css/tailwind.css',
         output: 'custom/output.css',
         domDiff: true,
-        watchOuput: false,
+        watchOutput: false,
       });
 
       expect(config.setServerOptions).toHaveBeenCalledWith(
@@ -137,13 +137,13 @@ describe('eleventy-plugin-tailwindcss-4', () => {
       tailwindcss(config, {
         input: 'css/tailwind.css',
         minify: true,
-        // output, watchOuput, domDiff, debug should all keep defaults
+        // output, watchOutput, domDiff, debug should all keep defaults
       });
 
       expect(config.setServerOptions).toHaveBeenCalledWith(
         expect.objectContaining({
           domDiff: false, // default
-          watch: ['_site/styles.css'], // default output, default watchOuput=true
+          watch: ['_site/styles.css'], // default output, default watchOutput=true
         })
       );
     });
@@ -379,7 +379,7 @@ describe('eleventy-plugin-tailwindcss-4', () => {
       );
     });
 
-    it('watches the generated CSS file by default (watchOuput: true)', () => {
+    it('watches the generated CSS file by default (watchOutput: true)', () => {
       const config = createMockConfig({ input: 'src', output: '_site' });
       tailwindcss(config, { input: 'css/tailwind.css' });
 
@@ -390,9 +390,9 @@ describe('eleventy-plugin-tailwindcss-4', () => {
       );
     });
 
-    it('does not watch the generated CSS file when watchOuput is false', () => {
+    it('does not watch the generated CSS file when watchOutput is false', () => {
       const config = createMockConfig();
-      tailwindcss(config, { input: 'css/tailwind.css', watchOuput: false });
+      tailwindcss(config, { input: 'css/tailwind.css', watchOutput: false });
 
       expect(config.setServerOptions).toHaveBeenCalledWith(
         expect.objectContaining({

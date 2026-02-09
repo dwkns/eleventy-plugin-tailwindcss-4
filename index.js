@@ -17,13 +17,13 @@ const tailwindcss = (eleventyConfig, options) => {
   const defaultOptions = {
     output: 'styles.css', // the generated CSS file
     minify: false, // Should we minify the CSS
-    watchOuput: true, // Should we watch the outpu folder for changes (almost certainly yes)
+    watchOutput: true, // Should we watch the output folder for changes (almost certainly yes)
     debug: false, // Show detailed debug info
     domDiff: false, // Does the Dev Server do domDiffing — it causes a flash of unstyled content if you do.
     debugTruncationLength: 300 // truncate the output of the CSS when printed to the console when debugging. 
   }
 
-  //merge defaltOptions with passed options
+  // Merge default options with passed options.
   options = { ...defaultOptions, ...options }
 
   // Start up message
@@ -137,7 +137,7 @@ const tailwindcss = (eleventyConfig, options) => {
     domDiff: options.domDiff,
 
     // Watch the output css file because eleventy isn't processing it. 
-    watch: options.watchOuput ? [generatedCSSfile] : [],
+    watch: options.watchOutput ? [generatedCSSfile] : [],
   });
 
 }
