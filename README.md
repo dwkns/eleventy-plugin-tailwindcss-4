@@ -76,7 +76,7 @@ module.exports = function (eleventyConfig) {
 
   eleventyConfig.addPlugin(tailwindcss, {
     input: 'css/tailwind.css', 
-    output: 'css/main.css',
+    output: 'css/main.css', 
     minify: true
   });
 
@@ -100,6 +100,11 @@ By defaul the plugin writes out your CSS to `_site/styles.css` or whatever you h
 | watchOutput | Optional | Boolean  | true         | Force a browser reload when output is written                      |      
 | domDiff     | Optional | Boolean  | false        | Don't use Dev Server domDiffing as it causes unstyled flashes      |      
 | debug       | Optional | Boolean  | false        | Show plugin and Tailwind debug output.                             |
+
+### Output file naming
+It is a good idea to not use the same name for your input and output file.
+- Using different names makes it easier to differentiate between the two files and know that processing has occured.
+- It avoids the output being overwitten if your source file is in a folder that you [passThroughFileCopy](https://www.11ty.dev/docs/copy/) to your output. 
 
 
 ## Example repo
