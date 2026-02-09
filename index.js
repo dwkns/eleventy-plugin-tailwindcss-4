@@ -31,20 +31,29 @@ const tailwindcss = (eleventyConfig, options) => {
     console.log(`${logPrefix}${kleur.green(`Starting with options:`) + nl + util.inspect(options, { colors: true, compact: false, depth: 5, breakLength: 80 })} `)
   }
 
-  // create the correct paths including eleventy input/output folders.
-  const tailwindSourceFile = `${eleventyConfig.dir.input}/${options.input}`
-  const generatedCSSfile = `${eleventyConfig.dir.output}/${options.output}`
+  // Create the correct paths including eleventy input/output folders.
+  // Use path.join() to normalise slashes (e.g. directories.output may have a trailing slash).
+  // options.input may be undefined if the user forgot to set it, so guard with null.
+  const tailwindSourceFile = options.input
+    ? path.join(eleventyConfig.dir.input, options.input)
+    : null
+
+  // Use eleventyConfig.directories.output as the definitive output path.
+  // eleventyConfig.dir.output does not reflect setOutputDirectory() calls.
+  const generatedCSSfile = path.join(eleventyConfig.directories.output, options.output)
 
   const generatedCSSpath = path.dirname(generatedCSSfile);
 
   if (options.debug) {
+    console.log(`${logPrefix + kleur.green(`Eleventy directories.output:`)} ${eleventyConfig.directories.output}`)
     console.log(`${logPrefix + kleur.green(`TailwindCSS source file:`)} ${tailwindSourceFile}`)
     console.log(`${logPrefix + kleur.green(`Generated CSS file:`)} ${generatedCSSfile}`)
     console.log(`${logPrefix + kleur.green(`Output path:`)} ${generatedCSSpath}`)
   }
 
-  // Check inputCSS is valid
-  const inputValid = existsSync(tailwindSourceFile)
+  // Check inputCSS is valid.
+  // tailwindSourceFile is null when options.input was not provided.
+  const inputValid = tailwindSourceFile && existsSync(tailwindSourceFile)
 
   if (!inputValid) {
     if (options.input == undefined) {
@@ -72,10 +81,15 @@ const tailwindcss = (eleventyConfig, options) => {
     const startTime = performance.now(); // log start time
 
     try {
+      if (options.debug) {
+        console.log(`${logPrefix + kleur.green(`eleventy.before — directories.output:`)} ${eleventyConfig.directories.output}`)
+        console.log(`${logPrefix + kleur.green(`eleventy.before — writing to:`)} ${generatedCSSfile}`)
+      }
+
       // Read the tailwind source file
       const css = await readFile(tailwindSourceFile);
       if (options.debug) {
-        console.log(`${logPrefix + kleur.green(`Source CSS read from:`)}${tailwindSourceFile}`)
+        console.log(`${logPrefix + kleur.green(`Source CSS read from:`)} ${tailwindSourceFile}`)
       }
 
       // Run PostCSS with our plugins
