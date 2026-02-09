@@ -1,8 +1,18 @@
 {
   "name": "eleventy-plugin-tailwindcss-4",
   "version": "2.0.1",
-  "main": "index.js",
   "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.js"
+    }
+  },
+  "engines": {
+    "node": ">=20.19 || >=22.12"
+  },
   "scripts": {
     "pub": "#### use ./bin/publish ### to publish to npm",
     "build": "npx rollup -c",
@@ -23,11 +33,9 @@
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.4"
   },
-  "exports": {
-    "import": "./index.js",
-    "require": "./index.cjs"
-  },
   "devDependencies": {
+    "@11ty/eleventy": "^3.1.2",
+    "@vitest/coverage-v8": "^4.0.18",
     "rollup": "^4.35.0",
     "vitest": "^4.0.18"
   }
