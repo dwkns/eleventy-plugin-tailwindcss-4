@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "pub": "#### use ./bin/publish ### to publish to npm",
-    "build": "npx rollup -c"
+    "build": "npx rollup -c",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,7 @@
     "require": "./index.cjs"
   },
   "devDependencies": {
-    "rollup": "^4.35.0"
+    "rollup": "^4.35.0",
+    "vitest": "^4.0.18"
   }
 }
