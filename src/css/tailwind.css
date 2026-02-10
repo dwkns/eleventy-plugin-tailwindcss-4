@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "./components/button.css";
+@import "./components/card.css";
+@import "../shared/reset.css";
+@import url("https://fonts.example.com/font.css");

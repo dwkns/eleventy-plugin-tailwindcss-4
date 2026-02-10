@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Import Tree Test</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+  <h1>Import Tree Test Page</h1>
+  <p>This page uses every CSS class from the fixture to verify imports are working.</p>
+
+  <!-- card.css -->
+  <div class="card">
+    <div class="card-title">Card Title</div>
+    <p>This card tests <code>card.css</code> (imported without <code>./</code> prefix).</p>
+
+    <!-- button.css -->
+    <a href="#" class="btn btn-primary">Primary Button</a>
+
+    <!-- badge.css (nested import via button.css) -->
+    <span class="badge">Badge</span>
+  </div>
+
+  <!-- A second card to make the reset.css body/margin styles visible -->
+  <div class="card">
+    <div class="card-title">Reset Test</div>
+    <p>If <code>reset.css</code> is working, there should be no default margins on the body, and the font should be system-ui.</p>
+  </div>
+
+</body>
+</html>

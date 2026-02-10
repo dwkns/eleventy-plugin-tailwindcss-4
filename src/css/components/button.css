@@ -1,0 +1,17 @@
+/* button.css — also imports badge.css to test nested import resolution */
+
+@import "./badge.css";
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #70cb6e;
+  color: #fff;
+}
