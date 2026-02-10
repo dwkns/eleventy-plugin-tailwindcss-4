@@ -77,14 +77,14 @@ describe('mutation testing — verify tests catch real bugs', () => {
     consoleSpy.mockRestore();
   });
 
-  // ---- MUTATION 1: default domDiff changed from false → true ----
-  it('MUTATION: if domDiff defaulted to true, tests would catch it', () => {
+  // ---- MUTATION 1: default domDiff changed from true → false ----
+  it('MUTATION: if domDiff defaulted to false, tests would catch it', () => {
     const config = createMockConfig();
     tailwindcss(config, { input: 'css/tailwind.css' });
 
-    // The real test expects domDiff: false. Verify that IS what we get.
+    // The real test expects domDiff: true. Verify that IS what we get.
     const call = config.setServerOptions.mock.calls[0][0];
-    expect(call.domDiff).toBe(false); // if code mutated to true, this fails ✓
+    expect(call.domDiff).toBe(true); // if code mutated to false, this fails ✓
   });
 
   // ---- MUTATION 2: default output changed from 'styles.css' → something else ----

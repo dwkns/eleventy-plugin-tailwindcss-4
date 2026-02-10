@@ -103,9 +103,9 @@ describe('eleventy-plugin-tailwindcss-4', () => {
       const config = createMockConfig();
       tailwindcss(config, { input: 'css/tailwind.css' });
 
-      // Defaults: domDiff=false, watchOutput=true
+      // Defaults: domDiff=true, watchOutput=true
       expect(config.setServerOptions).toHaveBeenCalledWith(
-        expect.objectContaining({ domDiff: false })
+        expect.objectContaining({ domDiff: true })
       );
       // Default output is 'styles.css', watchOutput is true so it should be watched
       expect(config.setServerOptions).toHaveBeenCalledWith(
@@ -120,13 +120,13 @@ describe('eleventy-plugin-tailwindcss-4', () => {
       tailwindcss(config, {
         input: 'css/tailwind.css',
         output: 'custom/output.css',
-        domDiff: true,
+        domDiff: false,
         watchOutput: false,
       });
 
       expect(config.setServerOptions).toHaveBeenCalledWith(
         expect.objectContaining({
-          domDiff: true,
+          domDiff: false,
           watch: [],
         })
       );
@@ -142,7 +142,7 @@ describe('eleventy-plugin-tailwindcss-4', () => {
 
       expect(config.setServerOptions).toHaveBeenCalledWith(
         expect.objectContaining({
-          domDiff: false, // default
+          domDiff: true, // default
           watch: ['_site/styles.css'], // default output, default watchOutput=true
         })
       );
@@ -438,21 +438,21 @@ describe('eleventy-plugin-tailwindcss-4', () => {
       expect(config.setServerOptions).toHaveBeenCalledTimes(1);
     });
 
-    it('sets domDiff to false by default', () => {
+    it('sets domDiff to true by default', () => {
       const config = createMockConfig();
       tailwindcss(config, { input: 'css/tailwind.css' });
 
       expect(config.setServerOptions).toHaveBeenCalledWith(
-        expect.objectContaining({ domDiff: false })
+        expect.objectContaining({ domDiff: true })
       );
     });
 
-    it('sets domDiff to true when specified in options', () => {
+    it('sets domDiff to false when specified in options', () => {
       const config = createMockConfig();
-      tailwindcss(config, { input: 'css/tailwind.css', domDiff: true });
+      tailwindcss(config, { input: 'css/tailwind.css', domDiff: false });
 
       expect(config.setServerOptions).toHaveBeenCalledWith(
-        expect.objectContaining({ domDiff: true })
+        expect.objectContaining({ domDiff: false })
       );
     });
 

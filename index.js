@@ -20,9 +20,8 @@ const tailwindcss = (eleventyConfig, options) => {
     minify: false, // Should we minify the CSS
     watchOutput: true, // Should we watch the output folder for changes (almost certainly yes)
     debug: false, // Show detailed debug info
-    domDiff: false, // Does the Dev Server do domDiffing — it causes a flash of unstyled content if you do.
+    domDiff: true, // Enable Dev Server domDiffing. Set to false if you experience unstyled content flashes.
     watchImports: true, // Watch @import-ed CSS files for changes (Issue #4)
-    debugTruncationLength: 300 // truncate the output of the CSS when printed to the console when debugging. 
   }
 
   // Merge default options with passed options.
@@ -77,7 +76,7 @@ const tailwindcss = (eleventyConfig, options) => {
     const sourceDir = path.dirname(path.resolve(tailwindSourceFile));
     const rel = (p) => path.relative(sourceDir, p);
     const importLogger = options.debug ? {
-      onSkipBare: (p) => console.log(`${logPrefix + kleur.yellow(`Skipping bare module import:`)} ${p}`),
+      onSkipBare: (p) => console.log(`${logPrefix + kleur.yellow(`Skipping wath of bare module import:`)} ${p}`),
       onSkipNotFound: (p) => console.log(`${logPrefix + kleur.yellow(`Imported file not found, skipping:`)} ${rel(p)}`),
       onWatch: (p) => console.log(`${logPrefix + kleur.green(`Watching imported file:`)} ${rel(p)}`),
     } : {};
@@ -139,8 +138,7 @@ const tailwindcss = (eleventyConfig, options) => {
   });
 
   eleventyConfig.setServerOptions({
-    // control whether domDiffing is on or off
-    // we turn it off by defaul as it causes a flash
+    // Enable or disable Dev Server domDiffing.
     domDiff: options.domDiff,
 
     // Watch the output css file because eleventy isn't processing it. 

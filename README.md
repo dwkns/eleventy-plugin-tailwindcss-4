@@ -1,8 +1,8 @@
 # Eleventy Plugin TailwindCSS 4 
 An Eleventy plugin to make it easier to use Tailwind 4.0.x with Eleventy 3.0.x
 
-## Version 2.0
-This version uses PostCSS under the hood to process your templates. It is MUCH faster than version 1.x.x. 
+## Version 3.0
+ESM-only. Watches `@import`ed CSS files for changes. Uses async fs operations and PostCSS under the hood.
 
 ## Installation & configuration
 
@@ -23,28 +23,27 @@ Import the plugin in your configuration file `eleventy.config.js`.
 ### ESM (recommended)
 ```js
 import tailwindcss from 'eleventy-plugin-tailwindcss-4'
-```
 
-### CJS
-This is an ESM-only package. In a CommonJS config file, use a dynamic `import()`:
-```js
-module.exports = async function (eleventyConfig) {
-  const { default: tailwindcss } = await import('eleventy-plugin-tailwindcss-4');
-  eleventyConfig.addPlugin(tailwindcss, {
-    input: 'css/tailwind.css',
-  });
-};
-```
-### Add the plugin
-`input` Is the only **_required_** option. It is your Tailwind source/config file and is relative to your Eleventy [input folder](https://www.11ty.dev/docs/config/#input-directory). 
-All ther options are optional see below. 
-```js
 eleventyConfig.addPlugin(tailwindcss, {
   input: 'css/tailwind.css' // required
 } );
 ```
+`input` Is the only **_required_** option. It is your Tailwind source/config file and is relative to your Eleventy [input folder](https://www.11ty.dev/docs/config/#input-directory). 
+All the options are optional see below. 
 
-#### Basic example
+### CJS
+This is an ESM package. In a CommonJS config file, use a dynamic `import()`:
+```js
+module.exports = async function (eleventyConfig) {
+  const { default: tailwindcss } = await import('eleventy-plugin-tailwindcss-4');
+  eleventyConfig.addPlugin(tailwindcss, {
+    input: 'css/tailwind.css' // required
+  });
+};
+```
+
+
+### Basic example
 Generate output CSS at `_site/styles.css` from your input at `src/css/tailwind.css`
 ```js
 import tailwindcss from 'eleventy-plugin-tailwindcss-4'
@@ -56,7 +55,7 @@ export default (eleventyConfig) => {
 }
 ```
 
-#### All options at default settings
+### All options at default settings
 Generate output CSS at `_site/styles.css` from your input at `src/css/tailwind.css`
 ```js
 import tailwindcss from 'eleventy-plugin-tailwindcss-4'
@@ -68,13 +67,13 @@ export default (eleventyConfig) => {
     minify: false,
     watchOutput: true,
     watchImports: true,
-    domDiff: false,
+    domDiff: true,
     debug: false
   });
 }
 ```
 
-#### CJS example
+### CJS example
 Generate minified CSS output at `_site/css/main.css`
 ```js
 module.exports = async function (eleventyConfig) {
@@ -104,18 +103,11 @@ By defaul the plugin writes out your CSS to `_site/styles.css` or whatever you h
 | minify       | Optional | Boolean  | false        | Use cssnano to minify.                                             |
 | watchOutput  | Optional | Boolean  | true         | Force a browser reload when output is written.                     |      
 | watchImports | Optional | Boolean  | true         | Watch `@import`ed CSS files for changes during `--serve`.          |      
-| domDiff      | Optional | Boolean  | false        | Don't use Dev Server domDiffing as it causes unstyled flashes.     |      
+| domDiff      | Optional | Boolean  | true         | Enable Dev Server domDiffing. Set to `false` if you experience unstyled content flashes. |      
 | debug        | Optional | Boolean  | false        | Show plugin and Tailwind debug output.                             |
 
 ### Watching `@import`ed CSS files
 The plugin automatically discovers CSS files referenced by `@import` statements in your source file and registers them as Eleventy watch targets. This means changes to imported files will trigger a rebuild when using `--serve`.
-
-The following import types are handled:
-- `@import "./components/button.css"` — watched (relative path)
-- `@import "components/card.css"` — watched (has file extension, treated as local)
-- `@import "../shared/reset.css"` — watched (parent directory)
-- `@import "tailwindcss"` — skipped (bare module, no file extension)
-- `@import url("https://...")` — skipped (url import)
 
 Nested imports are followed recursively. Set `watchImports: false` to disable this behaviour.
 
@@ -130,12 +122,11 @@ It is a good idea to not use the same name for your input and output file.
 ## Example repo
 [Example repo](https://github.com/dwkns/etw-minimal) of the plugin installed, configured (ES6) and working.
 
-## Known Issues
-There is an issue with the domDiffing of the Dev Server happening before the plugin can write the CSS to the output folder. This can cause an extra reload in the browser and in some circumstances a flash of incorrectly styled content. The plugin turns off domDiffing by default which stops this from happening. 
-
-You can overide this with `domDiff: true` in the options if you need to. 
+## domDiff
+The Dev Server's domDiffing is enabled by default. If you experience a flash of unstyled content, you can disable it with `domDiff: false` in the options.
 
 ## Versions
+3.0.0 ESM-only package. Watches `@import`ed CSS files for changes ([#4](https://github.com/dwkns/eleventy-plugin-tailwindcss-4/issues/4)). Correctly respects the configured output directory ([#5](https://github.com/dwkns/eleventy-plugin-tailwindcss-4/issues/5)). Async fs operations. domDiff enabled by default.
 2.0.1 Fixes an issue where in some cases output CSS could be written before output folder was created. 
 2.0.0 Major rewrite to use PostCSS under the hood
 
