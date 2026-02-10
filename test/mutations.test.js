@@ -107,7 +107,8 @@ describe('mutation testing — verify tests catch real bugs', () => {
 
   // ---- MUTATION 4: addWatchTarget not called ----
   it('MUTATION: if addWatchTarget were removed, tests would catch it', () => {
-    const config = createMockConfig();
+    // Use a non-existent input dir so resolveImports doesn't find real files on disk
+    const config = createMockConfig({ input: 'mock-src' });
     tailwindcss(config, { input: 'css/tailwind.css' });
 
     expect(config.addWatchTarget).toHaveBeenCalledTimes(1);

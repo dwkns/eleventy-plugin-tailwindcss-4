@@ -5,19 +5,16 @@
   "main": "./index.js",
   "module": "./index.js",
   "exports": {
-    ".": {
-      "import": "./index.js",
-      "require": "./index.js"
-    }
+    ".": "./index.js"
   },
   "engines": {
     "node": ">=20.19 || >=22.12"
   },
   "scripts": {
-    "pub": "#### use ./bin/publish ### to publish to npm",
-    "build": "npx rollup -c",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "dev": "rm -rf dist && eleventy --serve",
+    "build": "rm -rf dist && eleventy"
   },
   "repository": {
     "type": "git",
@@ -36,7 +33,6 @@
   "devDependencies": {
     "@11ty/eleventy": "^3.1.2",
     "@vitest/coverage-v8": "^4.0.18",
-    "rollup": "^4.35.0",
     "vitest": "^4.0.18"
   }
 }

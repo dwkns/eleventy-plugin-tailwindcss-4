@@ -6,6 +6,7 @@ import kleur from 'kleur';
 import cssnano from "cssnano";
 import { existsSync } from 'node:fs';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
+import { resolveImports } from './lib/resolveImports.js';
 
 // Variables to improve logging
 const nl = "\n"
@@ -20,6 +21,7 @@ const tailwindcss = (eleventyConfig, options) => {
     watchOutput: true, // Should we watch the output folder for changes (almost certainly yes)
     debug: false, // Show detailed debug info
     domDiff: false, // Does the Dev Server do domDiffing — it causes a flash of unstyled content if you do.
+    watchImports: true, // Watch @import-ed CSS files for changes (Issue #4)
     debugTruncationLength: 300 // truncate the output of the CSS when printed to the console when debugging. 
   }
 
@@ -69,6 +71,33 @@ const tailwindcss = (eleventyConfig, options) => {
   // CSS is not watched by default in eleventy
   eleventyConfig.addWatchTarget(tailwindSourceFile);
 
+  // Discover and watch @import-ed CSS files so changes to them trigger rebuilds (Issue #4).
+  // Only runs when the input file is valid and watchImports is enabled.
+  if (inputValid && options.watchImports) {
+    const sourceDir = path.dirname(path.resolve(tailwindSourceFile));
+    const rel = (p) => path.relative(sourceDir, p);
+    const importLogger = options.debug ? {
+      onSkipBare: (p) => console.log(`${logPrefix + kleur.yellow(`Skipping bare module import:`)} ${p}`),
+      onSkipNotFound: (p) => console.log(`${logPrefix + kleur.yellow(`Imported file not found, skipping:`)} ${rel(p)}`),
+      onWatch: (p) => console.log(`${logPrefix + kleur.green(`Watching imported file:`)} ${rel(p)}`),
+    } : {};
+
+    const importedFiles = resolveImports(tailwindSourceFile, importLogger);
+    for (const file of importedFiles) {
+      // Convert absolute paths from resolveImports to relative paths.
+      // Eleventy's watcher expects paths relative to the project root (like ./src/css/file.css).
+      const relativePath = path.relative(process.cwd(), file);
+      eleventyConfig.addWatchTarget(relativePath);
+    }
+    if (options.debug) {
+      console.log(`${logPrefix + kleur.green(`Total imported files watched:`)} ${importedFiles.length}`)
+    }
+  }
+
+  if (options.debug) {
+    console.log(`${logPrefix + kleur.green(`additionalWatchTargets:`)} ${nl}${util.inspect(eleventyConfig.additionalWatchTargets, { colors: true, compact: false })}`)
+  }
+
   // Run the Tailwind command in the before event handler.
   eleventyConfig.on("eleventy.before", async function () {
     if (!inputValid) return;
@@ -81,16 +110,8 @@ const tailwindcss = (eleventyConfig, options) => {
     const startTime = performance.now(); // log start time
 
     try {
-      if (options.debug) {
-        console.log(`${logPrefix + kleur.green(`eleventy.before — directories.output:`)} ${eleventyConfig.directories.output}`)
-        console.log(`${logPrefix + kleur.green(`eleventy.before — writing to:`)} ${generatedCSSfile}`)
-      }
-
       // Read the tailwind source file
       const css = await readFile(tailwindSourceFile);
-      if (options.debug) {
-        console.log(`${logPrefix + kleur.green(`Source CSS read from:`)} ${tailwindSourceFile}`)
-      }
 
       // Run PostCSS with our plugins
       const result = await postcss(plugins)
@@ -100,28 +121,14 @@ const tailwindcss = (eleventyConfig, options) => {
           map: { absolute: true }
         });
 
-      // result.css contains our 'compiled' css
-      if (options.debug) {
-        console.log(`${logPrefix + kleur.green(`PostCSS generated your CSS:`)} ${nl}${result.css.substring(0, options.debugTruncationLength)}...`)
-      }
-
       // Create the output folder if it doesn't already exist.
       // Required because PostCSS can complete before eleventy generates its first file.
       await mkdir(generatedCSSpath, { recursive: true });
-      if (options.debug) {
-        console.log(`${logPrefix + kleur.green(`Output directory:`)} ${generatedCSSpath} ${kleur.green(`exists or was created`)} `)
-      }
 
       // Write our generated CSS out to file.
       await writeFile(generatedCSSfile, result.css);
 
       const endTime = performance.now() // log completion time
-
-      // debug info
-      if (options.debug) {
-        console.log(`${logPrefix + kleur.green(`CSS written to:`)} ${generatedCSSfile}`)
-        console.log(`${logPrefix + kleur.green(`Processing`)} TailwindCSS ${kleur.green(`took `) + (endTime - startTime).toFixed(2)} ms`)
-      }
 
       // Print out success to the console with timings
       console.log(`${logPrefix + kleur.green(`Wrote `) + generatedCSSfile + kleur.green(` in `) + (endTime - startTime).toFixed(2)} ms`)

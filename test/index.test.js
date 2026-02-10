@@ -285,28 +285,105 @@ describe('eleventy-plugin-tailwindcss-4', () => {
   // =========================================================================
   describe('watch target registration', () => {
     let consoleSpy;
+    let tmpDir;
 
     beforeEach(() => {
       consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
     });
-    afterEach(() => {
+    afterEach(async () => {
       consoleSpy.mockRestore();
+      if (tmpDir) {
+        await rm(tmpDir, { recursive: true, force: true });
+        tmpDir = null;
+      }
     });
 
     it('calls addWatchTarget with the source file path', () => {
-      const config = createMockConfig({ input: 'src', output: '_site' });
+      // Use a non-existent input dir so resolveImports doesn't find real files
+      const config = createMockConfig({ input: 'mock-src', output: '_site' });
       tailwindcss(config, { input: 'css/tailwind.css' });
 
       expect(config.addWatchTarget).toHaveBeenCalledTimes(1);
-      expect(config.addWatchTarget).toHaveBeenCalledWith('src/css/tailwind.css');
+      expect(config.addWatchTarget).toHaveBeenCalledWith('mock-src/css/tailwind.css');
     });
 
     it('calls addWatchTarget even when the input file does not exist', () => {
-      const config = createMockConfig({ input: 'src', output: '_site' });
+      const config = createMockConfig({ input: 'mock-src', output: '_site' });
       tailwindcss(config, { input: 'nonexistent.css' });
 
       expect(config.addWatchTarget).toHaveBeenCalledTimes(1);
-      expect(config.addWatchTarget).toHaveBeenCalledWith('src/nonexistent.css');
+      expect(config.addWatchTarget).toHaveBeenCalledWith('mock-src/nonexistent.css');
+    });
+
+    it('calls addWatchTarget for each @import-ed CSS file (as relative paths)', async () => {
+      const fixture = await createTempFixture(
+        '@import "./components/button.css";\n.body { color: red; }'
+      );
+      tmpDir = fixture.tmpDir;
+
+      // Create the imported file
+      const componentsDir = path.join(path.dirname(fixture.cssFile), 'components');
+      await mkdir(componentsDir, { recursive: true });
+      const buttonFile = path.join(componentsDir, 'button.css');
+      await writeFile(buttonFile, '.btn { color: blue; }');
+
+      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
+      tailwindcss(config, { input: 'css/tailwind.css' });
+
+      // Should be called for source file + imported file
+      expect(config.addWatchTarget).toHaveBeenCalledTimes(2);
+      expect(config.addWatchTarget).toHaveBeenCalledWith(
+        path.join(fixture.inputDir, 'css/tailwind.css')
+      );
+      // Imported file paths are converted to relative paths for Eleventy's watcher
+      const expectedRelative = path.relative(process.cwd(), buttonFile);
+      expect(config.addWatchTarget).toHaveBeenCalledWith(expectedRelative);
+    });
+
+    it('does not watch imports when watchImports is false', async () => {
+      const fixture = await createTempFixture(
+        '@import "./components/button.css";\n.body { color: red; }'
+      );
+      tmpDir = fixture.tmpDir;
+
+      // Create the imported file
+      const componentsDir = path.join(path.dirname(fixture.cssFile), 'components');
+      await mkdir(componentsDir, { recursive: true });
+      await writeFile(path.join(componentsDir, 'button.css'), '.btn {}');
+
+      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
+      tailwindcss(config, { input: 'css/tailwind.css', watchImports: false });
+
+      // Only the source file, not the imported file
+      expect(config.addWatchTarget).toHaveBeenCalledTimes(1);
+      expect(config.addWatchTarget).toHaveBeenCalledWith(
+        path.join(fixture.inputDir, 'css/tailwind.css')
+      );
+    });
+
+    it('logs imported file count in debug mode', async () => {
+      const fixture = await createTempFixture(
+        '@import "./components/button.css";'
+      );
+      tmpDir = fixture.tmpDir;
+
+      const componentsDir = path.join(path.dirname(fixture.cssFile), 'components');
+      await mkdir(componentsDir, { recursive: true });
+      await writeFile(path.join(componentsDir, 'button.css'), '.btn {}');
+
+      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
+      tailwindcss(config, { input: 'css/tailwind.css', debug: true });
+
+      const watchingCall = consoleSpy.mock.calls.find(
+        call => typeof call[0] === 'string' && call[0].includes('Watching imported file')
+      );
+      expect(watchingCall).toBeDefined();
+
+      const totalCall = consoleSpy.mock.calls.find(
+        call => typeof call[0] === 'string' && call[0].includes('Total imported files watched')
+      );
+      expect(totalCall).toBeDefined();
+      expect(totalCall[0]).toContain('1');
     });
   });
 
@@ -688,117 +765,23 @@ describe('eleventy-plugin-tailwindcss-4', () => {
       expect(debugCalls).toHaveLength(0);
     });
 
-    it('logs "Source CSS read from" during processing when debug is true', async () => {
-      const fixture = await createTempFixture('.test { color: red; }');
-      tmpDir = fixture.tmpDir;
-
-      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
-      tailwindcss(config, { input: 'css/tailwind.css', debug: true });
-
-      await getBeforeHandler(config)();
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Source CSS read from')
-      );
-    });
-
-    it('logs "PostCSS generated your CSS" during processing when debug is true', async () => {
-      const fixture = await createTempFixture('.test { color: red; }');
-      tmpDir = fixture.tmpDir;
-
-      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
-      tailwindcss(config, { input: 'css/tailwind.css', debug: true });
-
-      await getBeforeHandler(config)();
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('PostCSS generated your CSS')
-      );
-    });
-
-    it('logs "Output directory" during processing when debug is true', async () => {
-      const fixture = await createTempFixture('.test { color: red; }');
-      tmpDir = fixture.tmpDir;
-
-      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
-      tailwindcss(config, { input: 'css/tailwind.css', debug: true });
-
-      await getBeforeHandler(config)();
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Output directory')
-      );
-    });
-
-    it('logs "CSS written to" during processing when debug is true', async () => {
-      const fixture = await createTempFixture('.test { color: red; }');
-      tmpDir = fixture.tmpDir;
-
-      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
-      tailwindcss(config, { input: 'css/tailwind.css', debug: true });
-
-      await getBeforeHandler(config)();
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('CSS written to')
-      );
-    });
-
-    it('logs processing time during processing when debug is true', async () => {
-      const fixture = await createTempFixture('.test { color: red; }');
-      tmpDir = fixture.tmpDir;
-
-      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
-      tailwindcss(config, { input: 'css/tailwind.css', debug: true });
-
-      await getBeforeHandler(config)();
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Processing')
-      );
-    });
-
-    it('does NOT log processing debug messages when debug is false', async () => {
+    it('does NOT log debug messages inside eleventy.before when debug is false', async () => {
       const fixture = await createTempFixture('.test { color: red; }');
       tmpDir = fixture.tmpDir;
 
       const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
       tailwindcss(config, { input: 'css/tailwind.css', debug: false });
 
+      // Clear init-time logs, then run the handler
+      consoleSpy.mockClear();
       await getBeforeHandler(config)();
 
-      const debugCalls = consoleSpy.mock.calls.filter(
-        call => typeof call[0] === 'string' &&
-          (call[0].includes('Source CSS read from') ||
-           call[0].includes('PostCSS generated your CSS') ||
-           call[0].includes('Output directory') ||
-           call[0].includes('CSS written to') ||
-           call[0].includes('Processing'))
+      // Only the "Wrote" success message should appear (always logged, not debug-only)
+      const calls = consoleSpy.mock.calls.filter(
+        call => typeof call[0] === 'string' && call[0].includes('[eleventy-plugin-tailwind-4]')
       );
-      // Only "Wrote" message should appear (that's always logged, not debug-only)
-      expect(debugCalls).toHaveLength(0);
+      expect(calls).toHaveLength(1);
+      expect(calls[0][0]).toContain('Wrote');
     });
-
-    it('truncates PostCSS output in debug log based on debugTruncationLength', async () => {
-      const fixture = await createTempFixture('@import "tailwindcss";');
-      tmpDir = fixture.tmpDir;
-
-      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
-      tailwindcss(config, {
-        input: 'css/tailwind.css',
-        debug: true,
-        debugTruncationLength: 50,
-      });
-
-      await getBeforeHandler(config)();
-
-      // Find the "PostCSS generated" log
-      const generatedCall = consoleSpy.mock.calls.find(
-        call => typeof call[0] === 'string' && call[0].includes('PostCSS generated your CSS')
-      );
-      expect(generatedCall).toBeDefined();
-      // Should end with "..." indicating truncation
-      expect(generatedCall[0]).toMatch(/\.\.\.$/);
-    }, 30000);
   });
 });
