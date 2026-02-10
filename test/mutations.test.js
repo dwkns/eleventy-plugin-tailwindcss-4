@@ -87,6 +87,24 @@ describe('mutation testing — verify tests catch real bugs', () => {
     expect(call.domDiff).toBe(true); // if code mutated to false, this fails ✓
   });
 
+  // ---- MUTATION: default sourceMap changed from false → true or 'inline' ----
+  it('MUTATION: if sourceMap defaulted to true, tests would catch it', async () => {
+    const fixture = await createTempFixture('.test { color: red; }');
+
+    try {
+      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
+      tailwindcss(config, { input: 'css/tailwind.css' });
+
+      await getBeforeHandler(config)();
+
+      const output = await readFile(path.join(fixture.outputDir, 'styles.css'), 'utf-8');
+      // Default is sourceMap: false — no sourcemap comment should be present
+      expect(output).not.toContain('sourceMappingURL'); // if code mutated to true or 'inline', this fails ✓
+    } finally {
+      await rm(fixture.tmpDir, { recursive: true });
+    }
+  });
+
   // ---- MUTATION 2: default output changed from 'styles.css' → something else ----
   it('MUTATION: if default output filename changed, tests would catch it', () => {
     const config = createMockConfig({ output: '_site' });

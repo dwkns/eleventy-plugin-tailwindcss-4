@@ -644,7 +644,7 @@ describe('eleventy-plugin-tailwindcss-4', () => {
       expect(wroteCalls[0][0]).toContain('ms');
     });
 
-    it('includes source map comment in output', async () => {
+    it('does not include a sourcemap by default (sourceMap: false)', async () => {
       const fixture = await createTempFixture('.test { color: red; }');
       tmpDir = fixture.tmpDir;
 
@@ -654,8 +654,61 @@ describe('eleventy-plugin-tailwindcss-4', () => {
       await getBeforeHandler(config)();
 
       const output = await readFile(path.join(fixture.outputDir, 'styles.css'), 'utf-8');
-      // PostCSS with map: { absolute: true } should include a sourceMappingURL
+      expect(output).not.toContain('sourceMappingURL');
+      // No .map file should exist
+      expect(existsSync(path.join(fixture.outputDir, 'styles.css.map'))).toBe(false);
+    });
+
+    it('writes an external .map file when sourceMap is true', async () => {
+      const fixture = await createTempFixture('.test { color: red; }');
+      tmpDir = fixture.tmpDir;
+
+      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
+      tailwindcss(config, { input: 'css/tailwind.css', sourceMap: true });
+
+      await getBeforeHandler(config)();
+
+      const output = await readFile(path.join(fixture.outputDir, 'styles.css'), 'utf-8');
+      // CSS should reference the external sourcemap
       expect(output).toContain('sourceMappingURL');
+      expect(output).not.toContain('sourceMappingURL=data:');
+
+      // .map file should exist alongside the CSS
+      const mapPath = path.join(fixture.outputDir, 'styles.css.map');
+      expect(existsSync(mapPath)).toBe(true);
+      const mapContent = await readFile(mapPath, 'utf-8');
+      expect(() => JSON.parse(mapContent)).not.toThrow();
+    });
+
+    it('embeds an inline sourcemap when sourceMap is "inline"', async () => {
+      const fixture = await createTempFixture('.test { color: red; }');
+      tmpDir = fixture.tmpDir;
+
+      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
+      tailwindcss(config, { input: 'css/tailwind.css', sourceMap: 'inline' });
+
+      await getBeforeHandler(config)();
+
+      const output = await readFile(path.join(fixture.outputDir, 'styles.css'), 'utf-8');
+      // CSS should contain an inline data: sourcemap
+      expect(output).toContain('sourceMappingURL=data:');
+
+      // No separate .map file should be written
+      expect(existsSync(path.join(fixture.outputDir, 'styles.css.map'))).toBe(false);
+    });
+
+    it('does not include a sourcemap when sourceMap is explicitly false', async () => {
+      const fixture = await createTempFixture('.test { color: red; }');
+      tmpDir = fixture.tmpDir;
+
+      const config = createMockConfig({ input: fixture.inputDir, output: fixture.outputDir });
+      tailwindcss(config, { input: 'css/tailwind.css', sourceMap: false });
+
+      await getBeforeHandler(config)();
+
+      const output = await readFile(path.join(fixture.outputDir, 'styles.css'), 'utf-8');
+      expect(output).not.toContain('sourceMappingURL');
+      expect(existsSync(path.join(fixture.outputDir, 'styles.css.map'))).toBe(false);
     });
 
     it('can be called multiple times (simulating multiple builds)', async () => {

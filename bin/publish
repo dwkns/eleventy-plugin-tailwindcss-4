@@ -1,4 +1,0 @@
-#!/usr/bin/env zsh
-npm run build &&
-git add . && git commit -m "build" && git push &&
-npm version patch --force && npm publish

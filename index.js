@@ -22,6 +22,7 @@ const tailwindcss = (eleventyConfig, options) => {
     debug: false, // Show detailed debug info
     domDiff: true, // Enable Dev Server domDiffing. Set to false if you experience unstyled content flashes.
     watchImports: true, // Watch @import-ed CSS files for changes (Issue #4)
+    sourceMap: false, // false = no sourcemap, true = external .map file, 'inline' = embedded in CSS
   }
 
   // Merge default options with passed options.
@@ -112,12 +113,19 @@ const tailwindcss = (eleventyConfig, options) => {
       // Read the tailwind source file
       const css = await readFile(tailwindSourceFile);
 
+      // Derive PostCSS map option from sourceMap setting
+      const mapOption = options.sourceMap === true
+        ? { inline: false }       // external .map file
+        : options.sourceMap === 'inline'
+          ? { inline: true }      // embedded in CSS
+          : false;                // no sourcemap
+
       // Run PostCSS with our plugins
       const result = await postcss(plugins)
         .process(css, {
           from: tailwindSourceFile,
           to: generatedCSSfile,
-          map: { absolute: true }
+          map: mapOption
         });
 
       // Create the output folder if it doesn't already exist.
@@ -126,6 +134,11 @@ const tailwindcss = (eleventyConfig, options) => {
 
       // Write our generated CSS out to file.
       await writeFile(generatedCSSfile, result.css);
+
+      // Write external sourcemap file when sourceMap is true (not inline, not false)
+      if (options.sourceMap === true && result.map) {
+        await writeFile(generatedCSSfile + '.map', result.map.toString());
+      }
 
       const endTime = performance.now() // log completion time
 

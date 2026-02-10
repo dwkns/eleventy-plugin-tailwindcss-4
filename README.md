@@ -68,6 +68,7 @@ export default (eleventyConfig) => {
     watchOutput: true,
     watchImports: true,
     domDiff: true,
+    sourceMap: false,
     debug: false
   });
 }
@@ -104,6 +105,7 @@ By defaul the plugin writes out your CSS to `_site/styles.css` or whatever you h
 | watchOutput  | Optional | Boolean  | true         | Force a browser reload when output is written.                     |      
 | watchImports | Optional | Boolean  | true         | Watch `@import`ed CSS files for changes during `--serve`.          |      
 | domDiff      | Optional | Boolean  | true         | Enable Dev Server domDiffing. Set to `false` if you experience unstyled content flashes. |      
+| sourceMap    | Optional | Boolean/String | false   | `true` for external `.map` file, `'inline'` to embed in CSS, `false` to disable. |
 | debug        | Optional | Boolean  | false        | Show plugin and Tailwind debug output.                             |
 
 ### Watching `@import`ed CSS files
@@ -112,6 +114,9 @@ The plugin automatically discovers CSS files referenced by `@import` statements 
 Nested imports are followed recursively. Set `watchImports: false` to disable this behaviour.
 
 Enable `debug: true` to see which files are being watched and which are skipped.
+
+### Source maps
+Set `sourceMap: true` to generate an external `.map` file alongside your CSS output, or `sourceMap: 'inline'` to embed the sourcemap directly in the CSS. Defaults to `false` (no sourcemap). See [#2](https://github.com/dwkns/eleventy-plugin-tailwindcss-4/issues/2).
 
 ### Output file naming
 It is a good idea to not use the same name for your input and output file.
@@ -126,8 +131,10 @@ It is a good idea to not use the same name for your input and output file.
 The Dev Server's domDiffing is enabled by default. If you experience a flash of unstyled content, you can disable it with `domDiff: false` in the options.
 
 ## Versions
-3.0.0 ESM-only package. Watches `@import`ed CSS files for changes ([#4](https://github.com/dwkns/eleventy-plugin-tailwindcss-4/issues/4)). Correctly respects the configured output directory ([#5](https://github.com/dwkns/eleventy-plugin-tailwindcss-4/issues/5)). Async fs operations. domDiff enabled by default.
+3.0.0 ESM-only export. Watches `@import`ed CSS files for changes ([#4](https://github.com/dwkns/eleventy-plugin-tailwindcss-4/issues/4)). Correctly respects the configured output directory ([#5](https://github.com/dwkns/eleventy-plugin-tailwindcss-4/issues/5)). Optional sourcemap generation ([#2](https://github.com/dwkns/eleventy-plugin-tailwindcss-4/issues/2)). Fixed issues with unstyled flashes.
+
 2.0.1 Fixes an issue where in some cases output CSS could be written before output folder was created. 
+
 2.0.0 Major rewrite to use PostCSS under the hood
 
 ## Thanks
